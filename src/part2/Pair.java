@@ -1,4 +1,4 @@
-package part4.pairs;
+package part2;
 
 public class Pair {
 

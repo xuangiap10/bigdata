@@ -1,32 +1,26 @@
-
-package part4.pairs;
+package part2;
 
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map.Entry;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.*;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.*;
-//import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
  	
-public class InMapperCombiningRFP {
+public class RelativeFreqPair {
  	
 	
 	
 	public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
+		private final static IntWritable one = new IntWritable(1);
+		private Text word = new Text();
 		
-	 	private HashMap<String, Integer> pairMap;
-	 	public void setup(Context context){
-	 		pairMap = new HashMap<String, Integer>();
-	 	}
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			String line = value.toString();
 		    String []tokens = line.split(" ");
@@ -35,20 +29,11 @@ public class InMapperCombiningRFP {
 		    		String item1 = tokens[i];
 		    		String item2 = tokens[j];
 		    		if (item1.equalsIgnoreCase(item2)) break;
-		    		String keypair = item1 + "," + item2;
-			 		if (pairMap.containsKey(keypair)){
-			 			pairMap.put(keypair, pairMap.get(keypair)+ 1);
-			 		} else {
-			 			pairMap.put(keypair, 1);
-			 		}
+		    		word.set(item1 + "," + item2);
+		    		context.write(word, one);
 		    	}
 		    }
 		}
-	    public void cleanup(Context context) throws IOException, InterruptedException{
-	    	for (Entry<String, Integer> entry: pairMap.entrySet()){
-	    		context.write(new Text(entry.getKey()), new IntWritable(entry.getValue()));
-	    	}
-	    }
 		    
 	} 
  	
@@ -67,8 +52,8 @@ public class InMapperCombiningRFP {
 	public static void main(String[] args) throws Exception {
 		Configuration conf = new Configuration();
 
-		Job job = Job.getInstance(conf, "inmappercombiningrfp" );
-		job.setJarByClass(InMapperCombiningRFP.class);
+		Job job = Job.getInstance(conf, "relativefreqpair" );
+		job.setJarByClass(RelativeFreqPair.class);
 
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);

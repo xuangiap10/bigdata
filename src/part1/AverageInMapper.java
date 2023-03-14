@@ -1,4 +1,4 @@
-package part1.averageInMapper;
+package part1;
 
 import java.io.DataInput;
 import java.io.DataOutput;

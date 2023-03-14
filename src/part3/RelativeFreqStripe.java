@@ -1,4 +1,4 @@
-package part3.relativeFreqStripe;
+package part3;
 
 import java.io.DataInput;
 import java.io.DataOutput;

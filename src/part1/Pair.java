@@ -1,4 +1,4 @@
-package part1.averageInMapper;
+package part1;
 
 public class Pair<K,V> {
 
