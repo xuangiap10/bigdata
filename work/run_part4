@@ -3,7 +3,8 @@
 HADOOP=/usr/bin/hadoop
 H_PATH=/user/cloudera/bigdata
 
-WORK=/home/cloudera/work
+#WORK=/home/cloudera/work
+WORK=$PWD
 JARFILE=$WORK/bigdata.jar
 LOG=$WORK/hadoop.log
 
@@ -25,9 +26,14 @@ fi
 
 part="part4"
 
+if [ "$1" == "clean" ]; then
+	rm -rf $WORK/$part/output/*
+        exit
+fi
+
 $HADOOP fs -rm -r $H_PATH/$part
 
-for i in {1..1};
+for i in {1..10};
 do
 	for class in $C #$(eval "echo \$C$i")
 	do
