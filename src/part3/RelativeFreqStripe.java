@@ -3,7 +3,6 @@ package part3;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Scanner;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -65,31 +64,25 @@ public class RelativeFreqStripe {
 	 public static class Map extends Mapper<LongWritable, Text, Text, HashMapWritable> {
 				 	
 	    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-	    	try (Scanner scanner = new Scanner(value.toString())) {
-				while (scanner.hasNextLine()) {
-					String  line = scanner.nextLine();
-					String[] tokens = line.split("\\s+");
-					int num = tokens.length;
-					
-					for(int i = 0; i < num; i++){
-			
-						HashMapWritable map = new HashMapWritable();
-
-						for(int j = i+1; j < num; j++){
-							if(tokens[j].equals(tokens[i]))	break;
+	    	//logger.info("input --- " + value.toString());
 	
-							map.add(new Text(tokens[j]),1);
-						}
-						
-						if(map.size() > 0) {
-							context.write(new Text(tokens[i]), map);
-							//logger.info(tokens[i] + "  " + map.toString());
-						}
-					}
+			String[] tokens = value.toString().split("\\s+");
+			int num = tokens.length;
+			
+			for(int i = 0; i < num; i++){
+	
+				HashMapWritable map = new HashMapWritable();
+
+				for(int j = i+1; j < num; j++){
+					if(tokens[j].equals(tokens[i]))	break;
+
+					map.add(new Text(tokens[j]),1);
 				}
 				
-			}catch(Exception e) {
-				System.out.println(e.toString());
+				if(map.size() > 0) {
+					context.write(new Text(tokens[i]), map);
+					//logger.info(tokens[i] + "  " + map.toString());
+				}
 			}
 	    }
 	 } 

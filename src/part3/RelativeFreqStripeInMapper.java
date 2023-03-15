@@ -35,27 +35,19 @@ public class RelativeFreqStripeInMapper {
 		}
 
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-			try (Scanner scanner = new Scanner(value.toString())) {
-				while (scanner.hasNextLine()) {
-					String line = scanner.nextLine();
-					String[] tokens = line.split("\\s+");
-					int num = tokens.length;
+			String[] tokens = value.toString().split("\\s+");
+			int num = tokens.length;
 
-					for (int i = 0; i < num; i++) {
-						
-						if(!map.containsKey(tokens[i])) map.put(tokens[i], new HashMapWritable());
-
-						HashMapWritable submap = map.get(tokens[i]);
-
-						for (int j = i + 1; j < num; j++) {
-							if (tokens[j].equals(tokens[i])) break;
-							submap.add(new Text(tokens[j]), 1);
-						}
-					}
-				}
+			for (int i = 0; i < num; i++) {
 				
-			}catch(Exception e) {
-				System.out.println(e.toString());
+				if(!map.containsKey(tokens[i])) map.put(tokens[i], new HashMapWritable());
+
+				HashMapWritable submap = map.get(tokens[i]);
+
+				for (int j = i + 1; j < num; j++) {
+					if (tokens[j].equals(tokens[i])) break;
+					submap.add(new Text(tokens[j]), 1);
+				}
 			}
 	    }
 		

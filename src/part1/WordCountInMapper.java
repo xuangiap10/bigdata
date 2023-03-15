@@ -26,26 +26,17 @@ public class WordCountInMapper {
 	    }
 	 	
 	    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-	    	try (Scanner scanner = new Scanner(value.toString())) {
-				while (scanner.hasNextLine()) {
-					String  line = scanner.nextLine();
-					String[] tokens = line.split("[ ,\"'!?/-]");
-					for (String token : tokens) {
-						if(!token.isEmpty() && token.charAt(token.length()-1) == '.') 
-							token = token.substring(0,token.length()-1);
-						if (!token.matches("[a-zA-Z]+"))	continue;
-						
-						String oneWord = token.toLowerCase();
-						if(map.containsKey(oneWord))	map.put(oneWord,map.get(oneWord)+1);
-				 		else map.put(oneWord, 1);
-						
-					}
-				}
+			String[] tokens = value.toString().split("[ ,\"'!?/-]");
+			for (String token : tokens) {
+				if(!token.isEmpty() && token.charAt(token.length()-1) == '.') 
+					token = token.substring(0,token.length()-1);
+				if (!token.matches("[a-zA-Z]+"))	continue;
 				
-			}catch(Exception e) {
-				System.out.println(e.toString());
+				String oneWord = token.toLowerCase();
+				if(map.containsKey(oneWord))	map.put(oneWord,map.get(oneWord)+1);
+		 		else map.put(oneWord, 1);
+				
 			}
-	    	
 	    }
 	    
 	    @Override

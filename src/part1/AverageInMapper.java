@@ -4,7 +4,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Scanner;
 import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
@@ -59,29 +58,22 @@ public class AverageInMapper {
 	    }
 	 	
 	    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-	    	try (Scanner scanner = new Scanner(value.toString())) {
-				while (scanner.hasNextLine()) {
-					String  line = scanner.nextLine();
-					String[] tokens = line.split(" - - ");
-					if(tokens.length == 0)	continue;
-					//check if it is a valid ip
-					if(!tokens[0].matches("\\d+.\\d+.\\d+.\\d+")) continue;
-					String ip = tokens[0];
-					
-					String[] subTokens = tokens[1].split(" ");
-					String strQuantity = subTokens[subTokens.length-1];
-					//check if it is a valid number
-					if(!strQuantity.matches("\\d+")) continue;
-					PairWritable pair = new PairWritable(Integer.parseInt(strQuantity),1);
-					
-					if(map.containsKey(ip)) pair.add(map.get(ip));
-						
-					map.put(ip, pair);	
-				}
+	  
+			String[] tokens = value.toString().split(" - - ");
+			if(tokens.length == 0)	return;
+			//check if it is a valid ip
+			if(!tokens[0].matches("\\d+.\\d+.\\d+.\\d+")) return;
+			String ip = tokens[0];
+			
+			String[] subTokens = tokens[1].split(" ");
+			String strQuantity = subTokens[subTokens.length-1];
+			//check if it is a valid number
+			if(!strQuantity.matches("\\d+")) return;
+			PairWritable pair = new PairWritable(Integer.parseInt(strQuantity),1);
+			
+			if(map.containsKey(ip)) pair.add(map.get(ip));
 				
-			}catch(Exception e) {
-				System.out.println(e.toString());
-			}
+			map.put(ip, pair);	
 	    }
 	    
 	    @Override
