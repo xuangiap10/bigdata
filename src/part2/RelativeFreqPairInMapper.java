@@ -16,16 +16,18 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+import part2.RelativeFreqPair.PairWritable;
+
  	
 public class RelativeFreqPairInMapper {
  	
 	
 	
-	public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
+	public static class Map extends Mapper<LongWritable, Text, PairWritable, IntWritable> {
 		
-	 	private HashMap<String, Integer> pairMap;
+	 	private HashMap<PairWritable, Integer> pairMap;
 	 	public void setup(Context context){
-	 		pairMap = new HashMap<String, Integer>();
+	 		pairMap = new HashMap<PairWritable, Integer>();
 	 	}
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			String line = value.toString();
@@ -35,7 +37,8 @@ public class RelativeFreqPairInMapper {
 		    		String item1 = tokens[i];
 		    		String item2 = tokens[j];
 		    		if (item1.equalsIgnoreCase(item2)) break;
-		    		String keypair = item1 + "," + item2;
+		    		//String keypair = item1 + "," + item2;
+		    		PairWritable keypair = new PairWritable(item1, item2);
 			 		if (pairMap.containsKey(keypair)){
 			 			pairMap.put(keypair, pairMap.get(keypair)+ 1);
 			 		} else {
@@ -45,16 +48,16 @@ public class RelativeFreqPairInMapper {
 		    }
 		}
 	    public void cleanup(Context context) throws IOException, InterruptedException{
-	    	for (Entry<String, Integer> entry: pairMap.entrySet()){
-	    		context.write(new Text(entry.getKey()), new IntWritable(entry.getValue()));
+	    	for (Entry<PairWritable, Integer> entry: pairMap.entrySet()){
+	    		context.write(entry.getKey(), new IntWritable(entry.getValue()));
 	    	}
 	    }
 		    
 	} 
  	
-	public static class Reduce extends Reducer<Text, IntWritable, Text, LongWritable> {
+	public static class Reduce extends Reducer<PairWritable, IntWritable, PairWritable, LongWritable> {
 
-		public void reduce(Text key, Iterable<IntWritable> values, Context context) 
+		public void reduce(PairWritable key, Iterable<IntWritable> values, Context context) 
 				throws IOException, InterruptedException {
 			long sum = 0; 
 			for (IntWritable val : values) {
@@ -70,7 +73,10 @@ public class RelativeFreqPairInMapper {
 		Job job = Job.getInstance(conf, "inmappercombiningrfp" );
 		job.setJarByClass(RelativeFreqPairInMapper.class);
 
-		job.setOutputKeyClass(Text.class);
+		job.setMapOutputKeyClass(PairWritable.class);
+		job.setMapOutputValueClass(IntWritable.class);
+		
+		job.setOutputKeyClass(PairWritable.class);
 		job.setOutputValueClass(IntWritable.class);
 
 		job.setMapperClass(Map.class);
