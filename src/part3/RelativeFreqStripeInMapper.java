@@ -2,7 +2,6 @@ package part3;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Scanner;
 import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
