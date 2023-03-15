@@ -86,22 +86,32 @@ public class RelativeFreqPair {
 		    		String item2 = tokens[j];
 		    		if (item1.equalsIgnoreCase(item2)) break;
 		    		PairWritable pair = new PairWritable(item1, item2);
+		    		PairWritable pair1 = new PairWritable(item1, "*");
 		    		context.write(pair, one);
+		    		context.write(pair1, one);
 		    	}
 		    }
 		}
 		    
 	} 
  	
-	public static class Reduce extends Reducer<PairWritable, IntWritable, PairWritable, LongWritable> {
+	public static class Reduce extends Reducer<PairWritable, IntWritable, PairWritable, DoubleWritable> {
 
+		private long total = 0;
+		public void setup(Context context){
+			total = 0;
+		}
 		public void reduce(PairWritable key, Iterable<IntWritable> values, Context context) 
 				throws IOException, InterruptedException {
 			long sum = 0; 
 			for (IntWritable val : values) {
 				sum += val.get();
 			}
-			context.write(key, new LongWritable(sum));
+			if (key.getValue().equals("*")){
+				total = sum;
+			}else {
+				context.write(key, new DoubleWritable((double)sum/total));
+			}
 		}
 	}
 
@@ -115,7 +125,7 @@ public class RelativeFreqPair {
 		job.setMapOutputValueClass(IntWritable.class);
 		
 		job.setOutputKeyClass(PairWritable.class);
-		job.setOutputValueClass(IntWritable.class);
+		job.setOutputValueClass(DoubleWritable.class);
 
 		job.setMapperClass(Map.class);
 		job.setReducerClass(Reduce.class);

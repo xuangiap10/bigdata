@@ -98,8 +98,8 @@ do
 		if ! test -d $LOCAL_OUT ; then
 			mkdir -p $LOCAL_OUT
 		fi
-		$HADOOP fs -cat $OUTPUT/* > $LOCAL_OUT
-		cat $LOCAL_OUT
+		$HADOOP fs -cat $OUTPUT/* > $LOCAL_OUT/$class
+		cat $LOCAL_OUT/$class
 		echo -e "\n=======================END $part $class==================================="
 	done
 done
