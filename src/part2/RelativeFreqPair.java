@@ -15,19 +15,19 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 
+
  	
 public class RelativeFreqPair {
  	
 	public static class PairWritable extends Pair<String, String>  implements WritableComparable<PairWritable>{
 
+			public PairWritable(){
+				super("", "");
+			}
 			public PairWritable(String key, String value){
 				super(key, value);
 			}
-			/*public PairWritable add(PairWritable _pair){
-				this.setKey(this.getKey() + _pair.getKey());
-				this.setValue(this.getValue() + _pair.getValue());
-				return this;
-			}*/
+
 			public void set (String key, String value){
 				setKey(key);
 				setValue(value);
@@ -74,7 +74,6 @@ public class RelativeFreqPair {
 	
 	public static class Map extends Mapper<LongWritable, Text, PairWritable, IntWritable> {
 		private final static IntWritable one = new IntWritable(1);
-		//private Text word = new Text();
 		
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			String line = value.toString();
@@ -85,7 +84,6 @@ public class RelativeFreqPair {
 		    		String item2 = tokens[j];
 		    		if (item1.equalsIgnoreCase(item2)) break;
 		    		PairWritable pair = new PairWritable(item1, item2);
-		    		//word.set(item1 + "," + item2);
 		    		context.write(pair, one);
 		    	}
 		    }
@@ -93,7 +91,7 @@ public class RelativeFreqPair {
 		    
 	} 
  	
-	public static class Reduce extends Reducer<PairWritable, IntWritable, Text, LongWritable> {
+	public static class Reduce extends Reducer<PairWritable, IntWritable, PairWritable, LongWritable> {
 
 		public void reduce(PairWritable key, Iterable<IntWritable> values, Context context) 
 				throws IOException, InterruptedException {
@@ -101,7 +99,7 @@ public class RelativeFreqPair {
 			for (IntWritable val : values) {
 				sum += val.get();
 			}
-			context.write(new Text(key.toString()), new LongWritable(sum));
+			context.write(key, new LongWritable(sum));
 		}
 	}
 
@@ -111,7 +109,10 @@ public class RelativeFreqPair {
 		Job job = Job.getInstance(conf, "relativefreqpair" );
 		job.setJarByClass(RelativeFreqPair.class);
 
-		job.setOutputKeyClass(Text.class);
+		job.setMapOutputKeyClass(PairWritable.class);
+		job.setMapOutputValueClass(IntWritable.class);
+		
+		job.setOutputKeyClass(PairWritable.class);
 		job.setOutputValueClass(IntWritable.class);
 
 		job.setMapperClass(Map.class);
