@@ -17,6 +17,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 //import org.apache.log4j.Logger;
 
+
 import part3.RelativeFreqStripe.HashMapWritable;
 
 public class RelativeFreqStripeInMapper {
@@ -72,6 +73,8 @@ public class RelativeFreqStripeInMapper {
 		 		//loggerReduce.info(val.toString());
 		 	    h.add(val);
 		 	}
+		 	Double sum = h.sum();
+		 	h.divide(sum);
 		 	context.write(key, h);
 	    }
 	 }

@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.MapWritable;
@@ -30,6 +31,19 @@ public class RelativeFreqStripe {
 		
 		HashMapWritable() {super();}
 		
+		public Double sum(){
+			Double sum = 0.0;
+			 for (Entry<Writable, Writable> entry : entrySet()) {
+				 sum += Integer.parseInt(entry.getValue().toString());
+			 }
+			 return sum;
+		}
+		
+		public void divide(Double sum){
+			 for (Entry<Writable, Writable> entry : entrySet()) {
+				 put(entry.getKey(), new DoubleWritable(Integer.parseInt(entry.getValue().toString())/sum));
+			 }
+		}
 		public void add(HashMapWritable h){
 			 for (Entry<Writable, Writable> entry : h.entrySet()) {
 				 add(entry.getKey(),Integer.parseInt(entry.getValue().toString()));
@@ -95,6 +109,8 @@ public class RelativeFreqStripe {
 		 		//loggerReduce.info(val.toString());
 		 	    h.add(val);
 		 	}
+		 	Double sum = h.sum();
+		 	h.divide(sum);
 		 	context.write(key, h);
 	    }
 	 }
