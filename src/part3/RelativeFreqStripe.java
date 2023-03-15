@@ -40,7 +40,7 @@ public class RelativeFreqStripe {
 				 add(entry.getKey(),Integer.parseInt(entry.getValue().toString()));
 			 }
 		}
-		private void add(Writable key, Integer value){
+		public void add(Writable key, Integer value){
 			if(containsKey(key)) put(key,new IntWritable(Integer.parseInt(get(key).toString()) + value));
 			else put(key,new IntWritable(value));
 		}
