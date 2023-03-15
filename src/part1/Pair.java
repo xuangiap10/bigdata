@@ -5,7 +5,7 @@ public class Pair<K,V> {
 	private K key;
 	private V value;
 	
-	Pair(K _key, V _value) { 
+	public Pair(K _key, V _value) { 
 		key = _key;
 		value = _value;
 	}
