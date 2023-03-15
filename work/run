@@ -14,7 +14,7 @@ C3="RelativeFreqStripe RelativeFreqStripeInMapper"
 
 if [ "$1" == "-h" ]; then
 	echo -e "\n"
-	echo "	run [ p1|p2|p3 ] [-v]"
+	echo "	run [ p1|p2|p3 ] [a|b|c|d] [-v]"
 	echo "	-v: verbose (output log)"
 	echo "	p1|p2|p3: run part1 or part2 or part3"
 	echo "	no parameter: run all parts without log"
@@ -23,21 +23,15 @@ if [ "$1" == "-h" ]; then
 fi
 
 verbose=0
-if [ "$1" == "-v" ] || [ "$2" == "-v" ]; then
+if [ "$1" == "-v" ] || [ "$2" == "-v" ] || [ "$3" == "-v" ]; then
         verbose=1
 fi
 
 P=0
 case "$1" in 
-	"p1")
-		P=1
-	;;
-	"p2")
-		P=2
-	;;
-	"p3")
-		P=3
-	;;
+	"p1")	P=1 ;;
+	"p2")	P=2 ;;
+	"p3")	P=3 ;;
 esac
 
 i=0
@@ -47,7 +41,17 @@ do
 	if [ ! $P -eq $i ] && [ ! $P -eq 0 ]; then
 		continue;
 	fi
-	for class in $(eval "echo \$C$i")
+	inlist=$(eval "echo \$C$i")
+	if [ $P -eq 1 ]; then
+		case "$2" in 
+			"a")	inlist=WordCount ;;
+			"b")	inlist=WordCountInMapper ;;
+			"c")	inlist=Average ;;
+			"d")	inlist=AverageInMapper ;;
+		esac
+	fi
+	#for class in $(eval "echo \$C$i")
+	for class in $inlist
 	do
 		PACKAGE=$part.$class
 		INPUT=$H_PATH/$part/input
