@@ -27,7 +27,7 @@ part="part4"
 
 $HADOOP fs -rm -r $H_PATH/$part
 
-for i in {1..10};
+for i in {1..1};
 do
 	for class in $C #$(eval "echo \$C$i")
 	do
@@ -41,6 +41,7 @@ do
 		INPUT=$H_PATH/$part/input/$i
 		OUTPUT=$H_PATH/$part/$i/$class/output
 		LOCAL=$WORK/$part/input
+		LOCAL_OUT=$WORK/$part/output/$i
 		#Prepare input
 		if ! $HADOOP fs -test -d $INPUT ; then
 			$HADOOP fs -mkdir -p $INPUT
@@ -59,7 +60,10 @@ do
 		#echo -e "\n=======================INPUT================================="
 		#$HADOOP fs -cat $INPUT/*
 		#echo -e "\n=======================OUTPUT================================="
-		#$HADOOP fs -cat $OUTPUT/*
+		if  ! test -d $LOCAL_OUT ; then
+			mkdir -p $LOCAL_OUT
+		fi
+		$HADOOP fs -cat $OUTPUT/* > $LOCAL_OUT/$class
 		echo -e "\n=======================END $i: $part $class==================================="
 	done
 done

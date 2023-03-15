@@ -56,14 +56,17 @@ do
 		PACKAGE=$part.$class
 		INPUT=$H_PATH/$part/input
 		OUTPUT=$H_PATH/$part/$class/output
+		LOCAL_OUT=$WORK/$part/output/$class
 		LOCAL=$WORK/$part/input
 		if [[ "$class" == "WordCount"* ]]; then
 			LOCAL=$WORK/$part/input/wordcount
 			INPUT=$H_PATH/$part/input/wordcount
+			LOCAL_OUT=$WORK/$part/output/wordcount/$class
 		fi
 		if [[ "$class" == "Average"* ]]; then
 			LOCAL=$WORK/$part/input/average
 			INPUT=$H_PATH/$part/input/average
+			LOCAL_OUT=$WORK/$part/output/average/$class
 		fi
 		#Prepare input
 		if ! $HADOOP fs -test -d $INPUT ; then
@@ -83,7 +86,8 @@ do
 		#echo -e "\n=======================INPUT================================="
 		#$HADOOP fs -cat $INPUT/*
 		echo -e "\n=======================OUTPUT================================="
-		$HADOOP fs -cat $OUTPUT/*
+		$HADOOP fs -cat $OUTPUT/* > $LOCAL_OUT
+		cat $LOCAL_OUT
 		echo -e "\n=======================END $part $class==================================="
 	done
 done
