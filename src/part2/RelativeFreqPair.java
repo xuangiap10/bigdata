@@ -1,6 +1,8 @@
 package part2;
 
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.hadoop.fs.Path;
@@ -12,14 +14,67 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+
  	
 public class RelativeFreqPair {
  	
+	public static class PairWritable extends Pair<String, String>  implements WritableComparable<PairWritable>{
+
+			public PairWritable(String key, String value){
+				super(key, value);
+			}
+			/*public PairWritable add(PairWritable _pair){
+				this.setKey(this.getKey() + _pair.getKey());
+				this.setValue(this.getValue() + _pair.getValue());
+				return this;
+			}*/
+			public void set (String key, String value){
+				setKey(key);
+				setValue(value);
+			}
+			@Override
+			public void readFields(DataInput in) throws IOException {
+				// TODO Auto-generated method stub
+				 setKey(in.readUTF());
+			     setValue(in.readUTF());
+				
+			}
+			@Override
+			public void write(DataOutput out) throws IOException {
+				// TODO Auto-generated method stub
+				out.writeUTF(getKey());
+		        out.writeUTF(getValue());
+			}
+
+			@Override
+			public int compareTo(PairWritable other) {
+				// TODO Auto-generated method stub
+				int cmp = this.getKey().compareTo(other.getKey());
+				if (cmp != 0) return cmp;
+				return this.getValue().compareTo(other.getValue());
+			}
+			@Override
+			public int hashCode(){
+				return this.getKey().hashCode()*163 + this.getValue().hashCode();
+			}
+			@Override
+			public boolean equals(Object ob){
+				if ( ob instanceof PairWritable){
+					PairWritable other = (PairWritable)ob;
+					return this.getKey().equals(other.getKey()) &&
+							this.getValue().equals(other.getValue());
+				}
+				return false;
+			}
+			@Override
+			public String toString(){
+				return this.getKey() + "," + this.getValue();
+			}
+	}
 	
-	
-	public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
+	public static class Map extends Mapper<LongWritable, Text, PairWritable, IntWritable> {
 		private final static IntWritable one = new IntWritable(1);
-		private Text word = new Text();
+		//private Text word = new Text();
 		
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			String line = value.toString();
@@ -29,23 +84,24 @@ public class RelativeFreqPair {
 		    		String item1 = tokens[i];
 		    		String item2 = tokens[j];
 		    		if (item1.equalsIgnoreCase(item2)) break;
-		    		word.set(item1 + "," + item2);
-		    		context.write(word, one);
+		    		PairWritable pair = new PairWritable(item1, item2);
+		    		//word.set(item1 + "," + item2);
+		    		context.write(pair, one);
 		    	}
 		    }
 		}
 		    
 	} 
  	
-	public static class Reduce extends Reducer<Text, IntWritable, Text, LongWritable> {
+	public static class Reduce extends Reducer<PairWritable, IntWritable, Text, LongWritable> {
 
-		public void reduce(Text key, Iterable<IntWritable> values, Context context) 
+		public void reduce(PairWritable key, Iterable<IntWritable> values, Context context) 
 				throws IOException, InterruptedException {
 			long sum = 0; 
 			for (IntWritable val : values) {
 				sum += val.get();
 			}
-			context.write(key, new LongWritable(sum));
+			context.write(new Text(key.toString()), new LongWritable(sum));
 		}
 	}
 
