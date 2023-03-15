@@ -14,10 +14,19 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
  	
 public class Average {
+	public static boolean isValidIP(String ip) {
+		String pattern = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+							"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+							"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+							"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
+		return ip.matches(pattern);
+	}
+	public static boolean isNumeric(String str) {
+		String pattern = "^\\d+$";
+		return str.matches(pattern);
+	}
  	
 	public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
-		//private final static IntWritable one = new IntWritable(1);
-		//private Text word = new Text();
 		
 		public void map(LongWritable key, Text value, Context context) 
 						throws IOException, InterruptedException {
@@ -32,19 +41,7 @@ public class Average {
 			}
 		    if (isValidIP(firstItem) && isNumeric(lastItem)) {
 		        context.write(new Text(firstItem), new IntWritable(Integer.parseInt(lastItem)));
-		     }
-		    
-		}
-		private boolean isValidIP(String ip) {
-			String pattern = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-								"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-								"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-								"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
-			return ip.matches(pattern);
-		}
-		private boolean isNumeric(String str) {
-			String pattern = "^\\d+$";
-			return str.matches(pattern);
+		     }	    
 		}
 	} 
  	

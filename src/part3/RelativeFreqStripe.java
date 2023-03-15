@@ -65,17 +65,14 @@ public class RelativeFreqStripe {
 				 	
 	    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 	    	//logger.info("input --- " + value.toString());
-	
 			String[] tokens = value.toString().split("\\s+");
 			int num = tokens.length;
 			
 			for(int i = 0; i < num; i++){
-	
 				HashMapWritable map = new HashMapWritable();
 
 				for(int j = i+1; j < num; j++){
 					if(tokens[j].equals(tokens[i]))	break;
-
 					map.add(new Text(tokens[j]),1);
 				}
 				
@@ -87,7 +84,6 @@ public class RelativeFreqStripe {
 	    }
 	 } 
 	 
-	
 	 public static class Reduce extends Reducer<Text, HashMapWritable, Text, HashMapWritable> {
 	
 	    public void reduce(Text key, Iterable<HashMapWritable> values, Context context) 

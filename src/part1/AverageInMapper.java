@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
@@ -34,14 +35,12 @@ public class AverageInMapper {
 		}
 		@Override
 		public void readFields(DataInput in) throws IOException {
-			// TODO Auto-generated method stub
 			 setKey(in.readInt());
 		     setValue(in.readInt());
 			
 		}
 		@Override
 		public void write(DataOutput out) throws IOException {
-			// TODO Auto-generated method stub
 			out.writeInt(getKey());
 	        out.writeInt(getValue());
 		}
@@ -59,21 +58,22 @@ public class AverageInMapper {
 	 	
 	    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 	  
-			String[] tokens = value.toString().split(" - - ");
-			if(tokens.length == 0)	return;
-			//check if it is a valid ip
-			if(!tokens[0].matches("\\d+.\\d+.\\d+.\\d+")) return;
-			String ip = tokens[0];
+	    	String line = value.toString();
+			StringTokenizer tokenizer = new StringTokenizer(line);
+		    // Get the first and last item from the line
+		    String firstItem = tokenizer.nextToken();
+		    String lastItem = "";
+		    
+			while (tokenizer.hasMoreTokens()) {
+					lastItem = tokenizer.nextToken();
+			}
+			if (!Average.isValidIP(firstItem) || !Average.isNumeric(lastItem)) return;
 			
-			String[] subTokens = tokens[1].split(" ");
-			String strQuantity = subTokens[subTokens.length-1];
-			//check if it is a valid number
-			if(!strQuantity.matches("\\d+")) return;
-			PairWritable pair = new PairWritable(Integer.parseInt(strQuantity),1);
+			PairWritable pair = new PairWritable(Integer.parseInt(lastItem),1);
 			
-			if(map.containsKey(ip)) pair.add(map.get(ip));
+			if(map.containsKey(firstItem)) pair.add(map.get(firstItem));
 				
-			map.put(ip, pair);	
+			map.put(firstItem, pair);	
 	    }
 	    
 	    @Override
