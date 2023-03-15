@@ -70,7 +70,7 @@ public class RelativeFreqPair {
 			}
 			@Override
 			public String toString(){
-				return this.getKey() + "," + this.getValue();
+				return "(" + this.getKey() + ", " + this.getValue() + ")";
 			}
 	}
 	

@@ -13,7 +13,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
  	
-public class AverageComputation {
+public class Average {
  	
 	public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
 		//private final static IntWritable one = new IntWritable(1);
@@ -67,7 +67,7 @@ public class AverageComputation {
 		Configuration conf = new Configuration();
 
 		Job job = Job.getInstance(conf, "averagecomputation" );
-		job.setJarByClass(AverageComputation.class);
+		job.setJarByClass(Average.class);
 
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
