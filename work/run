@@ -3,7 +3,8 @@
 HADOOP=/usr/bin/hadoop
 H_PATH=/user/cloudera/bigdata
 
-WORK=/home/cloudera/work
+#WORK=/home/cloudera/work
+WORK=$PWD
 JARFILE=$WORK/bigdata.jar
 LOG=$WORK/hadoop.log
 
@@ -34,6 +35,14 @@ case "$1" in
 	"p3")	P=3 ;;
 esac
 
+if [ "$1" == "clean" ]; then
+	for part in $list  
+	do
+		rm -rf $WORK/$part/output/*
+	done
+	exit
+fi
+
 i=0
 for part in $list
 do
@@ -56,14 +65,17 @@ do
 		PACKAGE=$part.$class
 		INPUT=$H_PATH/$part/input
 		OUTPUT=$H_PATH/$part/$class/output
+		LOCAL_OUT=$WORK/$part/output
 		LOCAL=$WORK/$part/input
 		if [[ "$class" == "WordCount"* ]]; then
 			LOCAL=$WORK/$part/input/wordcount
 			INPUT=$H_PATH/$part/input/wordcount
+			LOCAL_OUT=$WORK/$part/output/wordcount
 		fi
 		if [[ "$class" == "Average"* ]]; then
 			LOCAL=$WORK/$part/input/average
 			INPUT=$H_PATH/$part/input/average
+			LOCAL_OUT=$WORK/$part/output/average
 		fi
 		#Prepare input
 		if ! $HADOOP fs -test -d $INPUT ; then
@@ -83,7 +95,11 @@ do
 		#echo -e "\n=======================INPUT================================="
 		#$HADOOP fs -cat $INPUT/*
 		echo -e "\n=======================OUTPUT================================="
-		$HADOOP fs -cat $OUTPUT/*
+		if ! test -d $LOCAL_OUT ; then
+			mkdir -p $LOCAL_OUT
+		fi
+		$HADOOP fs -cat $OUTPUT/* > $LOCAL_OUT
+		cat $LOCAL_OUT
 		echo -e "\n=======================END $part $class==================================="
 	done
 done
