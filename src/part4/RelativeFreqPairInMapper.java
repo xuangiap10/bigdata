@@ -17,7 +17,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
  	
-public class InMapperCombiningRFP {
+public class RelativeFreqPairInMapper {
  	
 	
 	
@@ -68,7 +68,7 @@ public class InMapperCombiningRFP {
 		Configuration conf = new Configuration();
 
 		Job job = Job.getInstance(conf, "inmappercombiningrfp" );
-		job.setJarByClass(InMapperCombiningRFP.class);
+		job.setJarByClass(RelativeFreqPairInMapper.class);
 
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
