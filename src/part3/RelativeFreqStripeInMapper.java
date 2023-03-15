@@ -16,13 +16,13 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 import part3.RelativeFreqStripe.HashMapWritable;
 
 public class RelativeFreqStripeInMapper {
-	private static Logger logger = Logger.getLogger(Mapper.class);
-	private static Logger loggerReduce = Logger.getLogger(Reducer.class);
+	//private static Logger logger = Logger.getLogger(Mapper.class);
+	//private static Logger loggerReduce = Logger.getLogger(Reducer.class);
 	
 	
 	 public static class Map extends Mapper<LongWritable, Text, Text, HashMapWritable> {	
@@ -75,10 +75,10 @@ public class RelativeFreqStripeInMapper {
 	    public void reduce(Text key, Iterable<HashMapWritable> values, Context context) 
 	      throws IOException, InterruptedException {
 
-	    	loggerReduce.info(key.toString());
+	    	//loggerReduce.info(key.toString());
 	    	HashMapWritable h = new HashMapWritable();
 		 	for (HashMapWritable val : values) {
-		 		loggerReduce.info(val.toString());
+		 		//loggerReduce.info(val.toString());
 		 	    h.add(val);
 		 	}
 		 	context.write(key, h);
@@ -89,7 +89,7 @@ public class RelativeFreqStripeInMapper {
 	 public static void main(String[] args) throws Exception {
 	    Configuration conf = new Configuration();
 		
-		Job job = Job.getInstance(conf, "Relative Frequency Pair Approach");
+		Job job = Job.getInstance(conf, "Relative Frequency Pair Approach in-mapper combining");
 		job.setJarByClass(RelativeFreqStripe.class);
 		
 		job.setMapOutputKeyClass(Text.class);

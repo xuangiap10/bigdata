@@ -3,8 +3,6 @@ package part1;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Map.Entry;

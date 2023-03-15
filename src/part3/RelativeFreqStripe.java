@@ -3,11 +3,7 @@ package part3;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Scanner;
-import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -23,16 +19,16 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 
 public class RelativeFreqStripe {
 
-	private static Logger logger = Logger.getLogger(Mapper.class);
-	private static Logger loggerReduce = Logger.getLogger(Reducer.class);
+	//private static Logger logger = Logger.getLogger(Mapper.class);
+	//private static Logger loggerReduce = Logger.getLogger(Reducer.class);
 	
 	public static class HashMapWritable extends MapWritable{
-		private static final long serialVersionUID = -4393659023305805436L;
+		
 		HashMapWritable() {super();}
 		
 		public void add(HashMapWritable h){
@@ -87,7 +83,7 @@ public class RelativeFreqStripe {
 						
 						if(map.size() > 0) {
 							context.write(new Text(tokens[i]), map);
-							logger.info(tokens[i] + "  " + map.toString());
+							//logger.info(tokens[i] + "  " + map.toString());
 						}
 					}
 				}
@@ -104,10 +100,10 @@ public class RelativeFreqStripe {
 	    public void reduce(Text key, Iterable<HashMapWritable> values, Context context) 
 	      throws IOException, InterruptedException {
 
-	    	loggerReduce.info(key.toString());
+	    	//loggerReduce.info(key.toString());
 	    	HashMapWritable h = new HashMapWritable();
 		 	for (HashMapWritable val : values) {
-		 		loggerReduce.info(val.toString());
+		 		//loggerReduce.info(val.toString());
 		 	    h.add(val);
 		 	}
 		 	context.write(key, h);
