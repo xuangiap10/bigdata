@@ -1,0 +1,65 @@
+#!/bin/sh
+
+HADOOP=/usr/bin/hadoop
+H_PATH=/user/cloudera/bigdata
+
+WORK=/home/cloudera/work
+JARFILE=$WORK/bigdata.jar
+LOG=$WORK/hadoop.log
+
+list="part4"
+C="RelativeFreqPair RelativeFreqStripe"
+
+if [ "$1" == "-h" ]; then
+	echo -e "\n"
+	echo "	run4 [-v]"
+	echo "	-v: verbose (output log)"
+	echo "	no parameter: run all parts without log"
+	echo -e "\n"
+	exit
+fi
+verbose=0
+if [ "$1" == "-v" ] || [ "$2" == "-v" ]; then
+        verbose=1
+fi
+
+part="part4"
+
+$HADOOP fs -rm -r $H_PATH/$part
+
+for i in {1..10};
+do
+	for class in $C #$(eval "echo \$C$i")
+	do
+		PACKAGE=$part.$class
+		if [ $class == "RelativeFreqPair" ]; then
+			PACKAGE="part2".$class
+		fi
+		if [ $class == "RelativeFreqStripe" ]; then
+			PACKAGE="part3".$class
+		fi
+		INPUT=$H_PATH/$part/input/$i
+		OUTPUT=$H_PATH/$part/$i/$class/output
+		LOCAL=$WORK/$part/input
+		#Prepare input
+		if ! $HADOOP fs -test -d $INPUT ; then
+			$HADOOP fs -mkdir -p $INPUT
+			$HADOOP fs -put $LOCAL/Input$i.txt $INPUT
+		fi 
+		#clean output
+		if $HADOOP fs -test -d $OUTPUT ; then
+			$HADOOP fs -rm -r $OUTPUT
+		fi
+		echo -e "\n=======================START $i: $part $class================================="
+		if [ $verbose -eq 1 ]; then
+			$HADOOP jar $JARFILE $PACKAGE $INPUT $OUTPUT  
+		else
+			$HADOOP jar $JARFILE $PACKAGE $INPUT $OUTPUT >/dev/null 2>&1  
+		fi
+		#echo -e "\n=======================INPUT================================="
+		#$HADOOP fs -cat $INPUT/*
+		#echo -e "\n=======================OUTPUT================================="
+		#$HADOOP fs -cat $OUTPUT/*
+		echo -e "\n=======================END $i: $part $class==================================="
+	done
+done

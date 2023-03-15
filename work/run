@@ -1,0 +1,85 @@
+#!/bin/sh
+
+HADOOP=/usr/bin/hadoop
+H_PATH=/user/cloudera/bigdata
+
+WORK=/home/cloudera/work
+JARFILE=$WORK/bigdata.jar
+LOG=$WORK/hadoop.log
+
+list="part1 part2 part3"
+C1="WordCount WordCountInMapper Average AverageInMapper"
+C2="RelativeFreqPair RelativeFreqPairInMapper"
+C3="RelativeFreqStripe RelativeFreqStripeInMapper"
+
+if [ "$1" == "-h" ]; then
+	echo -e "\n"
+	echo "	run [ p1|p2|p3 ] [-v]"
+	echo "	-v: verbose (output log)"
+	echo "	p1|p2|p3: run part1 or part2 or part3"
+	echo "	no parameter: run all parts without log"
+	echo -e "\n"
+	exit
+fi
+
+verbose=0
+if [ "$1" == "-v" ] || [ "$2" == "-v" ]; then
+        verbose=1
+fi
+
+P=0
+case "$1" in 
+	"p1")
+		P=1
+	;;
+	"p2")
+		P=2
+	;;
+	"p3")
+		P=3
+	;;
+esac
+
+i=0
+for part in $list
+do
+	i=$((i+1))
+	if [ ! $P -eq $i ] && [ ! $P -eq 0 ]; then
+		continue;
+	fi
+	for class in $(eval "echo \$C$i")
+	do
+		PACKAGE=$part.$class
+		INPUT=$H_PATH/$part/input
+		OUTPUT=$H_PATH/$part/$class/output
+		LOCAL=$WORK/$part/input
+		if [[ "$class" == "WordCount"* ]]; then
+			LOCAL=$WORK/$part/input/wordcount
+			INPUT=$H_PATH/$part/input/wordcount
+		fi
+		if [[ "$class" == "Average"* ]]; then
+			LOCAL=$WORK/$part/input/average
+			INPUT=$H_PATH/$part/input/average
+		fi
+		#Prepare input
+		if ! $HADOOP fs -test -d $INPUT ; then
+			$HADOOP fs -mkdir -p $INPUT
+			$HADOOP fs -put $LOCAL/input* $INPUT
+		fi 
+		#clean output
+		if $HADOOP fs -test -d $OUTPUT ; then
+			$HADOOP fs -rm -r $OUTPUT
+		fi
+		echo -e "\n=======================START $part $class================================="
+		if [ $verbose -eq 1 ]; then
+			$HADOOP jar $JARFILE $PACKAGE $INPUT $OUTPUT  
+		else
+			$HADOOP jar $JARFILE $PACKAGE $INPUT $OUTPUT >/dev/null 2>&1  
+		fi
+		#echo -e "\n=======================INPUT================================="
+		#$HADOOP fs -cat $INPUT/*
+		echo -e "\n=======================OUTPUT================================="
+		$HADOOP fs -cat $OUTPUT/*
+		echo -e "\n=======================END $part $class==================================="
+	done
+done
