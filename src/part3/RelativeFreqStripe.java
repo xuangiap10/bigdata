@@ -119,7 +119,7 @@ public class RelativeFreqStripe {
 	 public static void main(String[] args) throws Exception {
 	    Configuration conf = new Configuration();
 		
-		Job job = Job.getInstance(conf, "Relative Frequency Pair Approach");
+		Job job = Job.getInstance(conf, "Relative Frequency Stripe Approach");
 		job.setJarByClass(RelativeFreqStripe.class);
 		
 		job.setMapOutputKeyClass(Text.class);

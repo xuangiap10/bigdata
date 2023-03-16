@@ -83,7 +83,7 @@ public class RelativeFreqStripeInMapper {
 	 public static void main(String[] args) throws Exception {
 	    Configuration conf = new Configuration();
 		
-		Job job = Job.getInstance(conf, "Relative Frequency Pair Approach in-mapper combining");
+		Job job = Job.getInstance(conf, "Relative Frequency Stripe Approach in-mapper combining");
 		job.setJarByClass(RelativeFreqStripe.class);
 		
 		job.setMapOutputKeyClass(Text.class);
