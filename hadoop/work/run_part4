@@ -32,9 +32,15 @@ if [ "$1" == "clean" ]; then
 fi
 
 $HADOOP fs -rm -r $H_PATH/$part
+$HADOOP fs -mkdir -p $H_PATH/$part/input
 
 for i in {1..10};
 do
+	INPUT=$H_PATH/$part/input
+	LOCAL=$WORK/$part/input
+	LOCAL_OUT=$WORK/$part/output/$i
+	$HADOOP fs -put $LOCAL/Input$i.txt $INPUT
+
 	for class in $C #$(eval "echo \$C$i")
 	do
 		PACKAGE=$part.$class
@@ -44,15 +50,13 @@ do
 		if [ $class == "RelativeFreqStripe" ]; then
 			PACKAGE="part3".$class
 		fi
-		INPUT=$H_PATH/$part/input/$i
+		#INPUT=$H_PATH/$part/input/$i
 		OUTPUT=$H_PATH/$part/$i/$class/output
-		LOCAL=$WORK/$part/input
-		LOCAL_OUT=$WORK/$part/output/$i
 		#Prepare input
-		if ! $HADOOP fs -test -d $INPUT ; then
-			$HADOOP fs -mkdir -p $INPUT
-			$HADOOP fs -put $LOCAL/Input$i.txt $INPUT
-		fi 
+		#if ! $HADOOP fs -test -d $INPUT ; then
+			#$HADOOP fs -mkdir -p $INPUT
+		#	$HADOOP fs -put $LOCAL/Input$i.txt $INPUT
+		#fi 
 		#clean output
 		if $HADOOP fs -test -d $OUTPUT ; then
 			$HADOOP fs -rm -r $OUTPUT
