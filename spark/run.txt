@@ -1,0 +1,2 @@
+//run 1000 times need more stack 
+spark-shell --conf "spark.driver.extraJavaOptions=-Xss4m" -i sparkMean.scala
