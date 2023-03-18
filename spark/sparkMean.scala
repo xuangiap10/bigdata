@@ -40,7 +40,7 @@ outputFunc(meanVarPop)
 val sample = population.sample(false,0.25)
 
 //-------------------step 5: do 100 times
-var rddReSample: RDD[(String, (Double, Double))] = sc.emptyRDD[(String, (Double, Double))]
+var arrSample:Array[(String, (Double, Double, Int))] = Array.empty[(String, (Double, Double, Int))]
 val count = 1000
 for(i <- 1 to count){
 	//println(i)
@@ -49,15 +49,11 @@ for(i <- 1 to count){
 	//---------step 5b: same as step 3
 	val meanVarResample = meanVarFunc(resampledData)
 	//---------step 5c: Keep adding the values in some running sum
-	rddReSample = rddReSample ++ meanVarResample
+	arrSample = arrSample ++ meanVarResample.mapValues(v => (v._1,v._2,1)).collect()
 }
 
 //-------------------step 6: get the average and display the result
-val rddSample = rddReSample.mapValues(v => (v._1,v._2,1))
-val rddSampleReduce = rddSample.reduceByKey((v1,v2) => (v1._1 + v2._1, v1._2 + v2._2, v1._3 + v2._3))
-
+val rddSampleReduce = sc.parallelize(arrSample).reduceByKey((v1,v2) => (v1._1 + v2._1, v1._2 + v2._2, v1._3 + v2._3))
 val meanVarSample = rddSampleReduce.map{case (k, (m,v,cnt)) => (k,(m/cnt,v/cnt))}
 outputFunc(meanVarSample)
-
-
-
+exit
