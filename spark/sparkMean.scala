@@ -1,14 +1,16 @@
+val filename = "airquality.csv"
+val cateCol = 5
+val numCol = 4
 /*
-val csv = sc.textFile("mtcars.csv") 
-val headerAndRows = csv.map(line => line.split(",").map(_.trim))
-val header = headerAndRows.first
-val population = headerAndRows.filter(_(0) != header(0)).map(p => (p(2), p(1).toDouble)).cache()
+val filename = "mtcars.csv"
+val cateCol = 2
+val numCol = 1
 */
 
-val csv = sc.textFile("airquality.csv") 
+val csv = sc.textFile(filename) 
 val headerAndRows = csv.map(line => line.split(",").map(_.trim))
 val header = headerAndRows.first
-val population = headerAndRows.filter(_(0) != header(0)).map(p => (p(5), p(4).toDouble)).cache()
+val population = headerAndRows.filter(_(0) != header(0)).map(p => (p(cateCol), p(numCol).toDouble)).cache()
 
   
 import org.apache.spark.rdd.RDD
@@ -16,7 +18,7 @@ def meanVarFunc(rdd: RDD[(String,Double)]): RDD[(String,(Double,Double))] = {
 	rdd.groupByKey().mapValues(values => {
 	val n = values.size
 	val mean = values.sum / n
-	val variance = values.map(x => math.pow(x - mean, 2)).sum / (n-1)
+	val variance = values.map(x => math.pow(x - mean, 2)).sum / n
 	(mean, variance)
 	})
 }
